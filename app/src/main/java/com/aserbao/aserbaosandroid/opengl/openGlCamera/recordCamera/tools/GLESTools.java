@@ -3,6 +3,7 @@ package com.aserbao.aserbaosandroid.opengl.openGlCamera.recordCamera.tools;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.util.Log;
 
@@ -102,10 +103,15 @@ public class GLESTools {
         return texture[0];
     }
 
+    //todo dxy
     public static void createFrameBuff(int[] frameBuffer, int[] frameBufferTex, int width, int height) {
+        // 创建FBO
         GLES20.glGenFramebuffers(1, frameBuffer, 0);
+        // 创建FBO纹理
         GLES20.glGenTextures(1, frameBufferTex, 0);
+        //绑定纹理
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, frameBufferTex[0]);
+        // 设置FBO,分配内存大小
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
         GLESTools.checkGlError("createCamFrameBuff");
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
@@ -116,8 +122,17 @@ public class GLESTools {
                 GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
                 GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        //纹理关联 fbo
+
+        // 綁定FBO
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
+        //将纹理附着到帧缓冲中
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, frameBufferTex[0], 0);
+        // 检测fbo绑定是否成功
+//        if(GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER) != GLES30.GL_FRAMEBUFFER_COMPLETE){
+//            throw new RuntimeException("FBO附着异常");
+//        }
+        //解绑纹理和FBO
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLESTools.checkGlError("createCamFrameBuff");
